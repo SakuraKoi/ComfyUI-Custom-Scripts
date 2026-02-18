@@ -1,12 +1,24 @@
 # ComfyUI-Custom-Scripts
 
+# What this fork modded
+
+Make image preview works for every node(Load LoRA/Power Lora Loader etc...), not only pysssss's custom lora/checkpoint loader
+
+Also, make it compatible with rgthree's Nested folder feature
+
+**Disable original Combo++ extension is required**
+
+
+
+---
+
 ### ⚠️ While these extensions work for the most part, i'm very busy at the moment and so unable to keep on top of everything here, thanks for your patience!
 
 # Installation
 
 1. Clone the repository:
-`git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git`  
-to your ComfyUI `custom_nodes` directory
+   `git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git`  
+   to your ComfyUI `custom_nodes` directory
 
    The script will then automatically install all custom scripts and nodes.  
    It will attempt to use symlinks and junctions to prevent having to copy files and keep them up to date.
