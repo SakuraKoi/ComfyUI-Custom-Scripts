@@ -3,16 +3,17 @@ import { ComfyWidgets } from "../../../scripts/widgets.js";
 import { $el } from "../../../scripts/ui.js";
 import { api } from "../../../scripts/api.js";
 
-const CHECKPOINT_LOADER = "CheckpointLoader|pysssss";
-const LORA_LOADER = "LoraLoader|pysssss";
 const IMAGE_WIDTH = 384;
 const IMAGE_HEIGHT = 384;
 
 function getType(node) {
-	if (node.comfyClass === CHECKPOINT_LOADER) {
+	if (node.comfyClass.toLowerCase().indexOf("checkpoint") >= 0) {
 		return "checkpoints";
 	}
-	return "loras";
+	if (node.comfyClass.toLowerCase().indexOf("lora") >= 0) {
+        return "loras";
+    }
+    return null;
 }
 
 function getWidgetName(type) {
@@ -201,7 +202,7 @@ app.registerExtension({
                 }
                 
 				if (images[text]) {
-					const textNode = document.createTextNode("*");
+					const textNode = document.createTextNode(" *");
 					item.appendChild(textNode);
 
 					item.addEventListener(
@@ -257,13 +258,13 @@ app.registerExtension({
 				}
 
 				for (const added of mutation.addedNodes) {
-					if (added.classList?.contains("litecontextmenu")) {
+					if (added.classList?.contains("litecontextmenu") && added.classList?.contains("dark")) {
 						const type = getType(node);
-						requestAnimationFrame(() => {
-							// Bad hack to prevent showing on right click menu by checking for the filter input
-							if (!added.querySelector(".comfy-context-menu-filter")) return;
-							updateMenu(added, type);
-						});
+                        if (type != null) {
+                            requestAnimationFrame(() => {
+                                updateMenu(added, type);
+                            });
+                        }
 						return;
 					}
 				}
