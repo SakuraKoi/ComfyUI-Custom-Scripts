@@ -16,7 +16,7 @@
 
    Also, it compatible with rgthree's Nested folder, highlight selected folder
 
-   **Disable `Comfy.ContextMenuFilter ` extension  is required** 
+   **Disable `Comfy.ContextMenuFilter ` extension is suggested** 
 
 ![image-20260219162334632](https://files.seeusercontent.com/2026/02/19/i3cP/image-20260219162334632.png)
 
