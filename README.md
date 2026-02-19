@@ -2,13 +2,23 @@
 
 # What this fork modded
 
-Make image preview works for every node(Load LoRA/Power Lora Loader etc...), not only pysssss's custom lora/checkpoint loader
+1. **Image preview**
 
-Also, make it compatible with rgthree's Nested folder feature
+   Make image preview works for every node(Load LoRA/Power Lora Loader etc...), not only pysssss's custom lora/checkpoint loader
 
-**Disable original Combo++ extension is required**
+   Also, make it compatible with rgthree's Nested folder feature
 
+   **Disable `pysssss.Combo++ ` extension is required**
 
+2. **Model selection menu CSS improvements**
+
+   QoL changes :)
+
+   Also, it compatible with rgthree's Nested folder, highlight selected folder
+
+   **Disable `Comfy.ContextMenuFilter ` extension  is required** 
+
+![image-20260219162334632](https://files.seeusercontent.com/2026/02/19/i3cP/image-20260219162334632.png)
 
 ---
 
