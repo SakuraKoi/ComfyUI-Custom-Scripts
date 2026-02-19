@@ -202,9 +202,9 @@ app.registerExtension({
                 }
                 
 				if (images[text]) {
-					const textNode = document.createTextNode(" *");
-					item.appendChild(textNode);
-
+					const textNode = document.createTextNode("💠 ");
+					//item.appendChild(textNode);
+                    item.insertBefore(textNode, item.childNodes[0]);
 					item.addEventListener(
 						"mouseover",
 						() => {
@@ -228,7 +228,10 @@ app.registerExtension({
 						},
 						{ passive: true }
 					);
-				}
+				} else {
+					const textNode = document.createTextNode("🔷 ");
+                    item.insertBefore(textNode, item.childNodes[0]);
+                }
 			};
 
 			const addImageData = (item) => {
@@ -271,142 +274,5 @@ app.registerExtension({
 			}
 		});
 		mutationObserver.observe(document.body, { childList: true, subtree: false });
-	},
-	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		const isCkpt = nodeData.name === CHECKPOINT_LOADER;
-		const isLora = nodeData.name === LORA_LOADER;
-		if (isCkpt || isLora) {
-			const onAdded = nodeType.prototype.onAdded;
-			nodeType.prototype.onAdded = function () {
-				onAdded?.apply(this, arguments);
-				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""], {}], app);
-				this.widgets.find((w) => w.name === "prompt").computeSize = () => [0, -4];
-				let exampleWidget;
-
-				const get = async (route, suffix) => {
-					const url = encodeRFC3986URIComponent(`${getType(nodeType)}${suffix || ""}`);
-					return await api.fetchApi(`/pysssss/${route}/${url}`);
-				};
-
-				const getExample = async () => {
-					if (exampleList.value === "[none]") {
-						if (exampleWidget) {
-							exampleWidget.inputEl.remove();
-							exampleWidget = null;
-							this.widgets.length -= 1;
-						}
-						return;
-					}
-
-					const v = this.widgets[0].value;
-					const pos = v.lastIndexOf(".");
-					const name = v.substr(0, pos);
-					let exampleName = exampleList.value;
-					let viewPath = `/${name}`;
-					if (exampleName === "notes") {
-						viewPath += ".txt";
-					} else {
-						viewPath += `/${exampleName}`;
-					}
-					const example = await (await get("view", viewPath)).text();
-					if (!exampleWidget) {
-						exampleWidget = ComfyWidgets["STRING"](this, "prompt", ["STRING", { multiline: true }], app).widget;
-						exampleWidget.inputEl.readOnly = true;
-						exampleWidget.inputEl.style.opacity = 0.6;
-					}
-					exampleWidget.value = example;
-				};
-
-				const exampleCb = exampleList.callback;
-				exampleList.callback = function () {
-					getExample();
-					return exampleCb?.apply(this, arguments) ?? exampleList.value;
-				};
-
-				const listExamples = async () => {
-					exampleList.disabled = true;
-					exampleList.options.values = ["[none]"];
-					exampleList.value = "[none]";
-					let examples = [];
-					if (this.widgets[0].value) {
-						try {
-							examples = await (await get("examples", `/${this.widgets[0].value}`)).json();
-						} catch (error) {}
-					}
-					exampleList.options.values = ["[none]", ...examples];
-					exampleList.value = exampleList.options.values[+!!examples.length];
-					exampleList.callback();
-					exampleList.disabled = !examples.length;
-					app.graph.setDirtyCanvas(true, true);
-				};
-
-				// Expose function to update examples
-				nodeType.prototype["pysssss.updateExamples"] = listExamples;
-
-				const modelWidget = this.widgets[0];
-				const modelCb = modelWidget.callback;
-				let prev = undefined;
-				modelWidget.callback = function () {
-					let ret = modelCb?.apply(this, arguments) ?? modelWidget.value;
-					if (typeof ret === "object" && "content" in ret) {
-						ret = ret.content;
-						modelWidget.value = ret;
-					}
-					let v = ret;
-					if (prev !== v) {
-						listExamples();
-						prev = v;
-					}
-					return ret;
-				};
-				setTimeout(() => {
-					modelWidget.callback();
-				}, 30);
-			};
-		}
-
-		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;
-		nodeType.prototype.getExtraMenuOptions = function (_, options) {
-			if (this.imgs) {
-				// If this node has images then we add an open in new tab item
-				let img;
-				if (this.imageIndex != null) {
-					// An image is selected so select that
-					img = this.imgs[this.imageIndex];
-				} else if (this.overIndex != null) {
-					// No image is selected but one is hovered
-					img = this.imgs[this.overIndex];
-				}
-				if (img) {
-					const nodes = app.graph._nodes.filter((n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER);
-					if (nodes.length) {
-						options.unshift({
-							content: "Save as Preview",
-							submenu: {
-								options: nodes.map((n) => ({
-									content: n.widgets[0].value,
-									callback: async () => {
-										const url = new URL(img.src);
-										await api.fetchApi("/pysssss/save/" + encodeRFC3986URIComponent(`${getType(n)}/${n.widgets[0].value}`), {
-											method: "POST",
-											body: JSON.stringify({
-												filename: url.searchParams.get("filename"),
-												subfolder: url.searchParams.get("subfolder"),
-												type: url.searchParams.get("type"),
-											}),
-											headers: {
-												"content-type": "application/json",
-											},
-										});
-										loadImageList(getType(n));
-									},
-								})),
-							},
-						});
-					}
-				}
-			}
-			return getExtraMenuOptions?.apply(this, arguments);
-		};
-	},
+	}
 });
